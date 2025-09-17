@@ -1,2 +1,3 @@
-# Ignore untuk .exe pada program
+# Ignore yg gk di commit cuy
+.vscode/
 /CPP/main.exe

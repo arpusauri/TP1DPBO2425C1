@@ -1,17 +1,18 @@
 #include "TokoElektronik.cpp"
+
 using namespace std;
 
 int main() {
     int pilihan;
     
-    // Inisialisasi data sample
+    // inisialisasi data sample
     initSampleData();
     
     do {
         tampilkanMenu();
-        cout << "Pilih menu (1-6): ";
+        cout << "Pilih menu : ";
         cin >> pilihan;
-        cin.ignore(); // Clear buffer setelah input integer
+        cin.ignore();
         
         switch(pilihan) {
             case 1:
@@ -38,7 +39,7 @@ int main() {
         
         if (pilihan != 6) {
             cout << "\nTekan Enter untuk kembali ke menu...";
-            cin.get(); // Wait untuk user input
+            cin.get();
         }
         
     } while (pilihan != 6);

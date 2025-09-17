@@ -69,14 +69,14 @@ vector<TokoElektronik> dataBarang;
 void tampilkanMenu() {
     cout << "\n";
     cout << "=====================================" << endl;
-    cout << "  SISTEM MANAJEMEN TOKO ELEKTRONIK" << endl;
+    cout << "     SISTEM MANAJEMEN TOKO ELEKTRONIK" << endl;
     cout << "=====================================" << endl;
-    cout << "1. Tampilkan semua data" << endl;
-    cout << "2. Tambah data" << endl;
-    cout << "3. Update data" << endl;
-    cout << "4. Hapus data" << endl;
-    cout << "5. Cari data" << endl;
-    cout << "6. Keluar" << endl;
+    cout << "1. TAMPILKAN DATA" << endl;
+    cout << "2. TAMBAHKAN DATA" << endl;
+    cout << "3. UBAH DATA" << endl;
+    cout << "4. HAPUS DATA" << endl;
+    cout << "5. CARI DATA" << endl;
+    cout << "6. EXIT" << endl;
     cout << "=====================================" << endl;
 }
 
@@ -110,7 +110,7 @@ int cariIndexById(string id) {
             return i;
         }
     }
-    return -1; // tidak ditemukan
+    return -1; 
 }
 
 // fungsi untuk menambah data
@@ -124,7 +124,6 @@ void tambahData() {
     cout << "Masukkan ID Barang: ";
     getline(cin, id);
     
-    // Cek apakah ID sudah ada
     if (cariIndexById(id) != -1) {
         cout << "Error: ID Barang sudah ada!" << endl;
         return;
@@ -276,7 +275,7 @@ void cariData() {
 
 // fungsi untuk inisialisasi data sample
 void initSampleData() {
-    dataBarang.push_back(TokoElektronik("TV001", "Smart TV Samsung 43\"", 5500000, 15));
-    dataBarang.push_back(TokoElektronik("HP001", "iPhone 15 Pro Max", 18900000, 8));
-    dataBarang.push_back(TokoElektronik("LP001", "MacBook Air M2", 16500000, 12));
+    dataBarang.push_back(TokoElektronik("TV001", "43\" The Frame 4K Samsung Smart TV", 11999000, 15));
+    dataBarang.push_back(TokoElektronik("HP001", "iPhone 17 Pro Max", 19719000, 8));
+    dataBarang.push_back(TokoElektronik("LP001", "MacBook Air M4", 17999000, 12));
 }
