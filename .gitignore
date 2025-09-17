@@ -1,3 +1,4 @@
-# Ignore yg gk di commit cuy
+# Ignore file biar gk di push cuy
 .vscode/
 /CPP/main.exe
+__pycache__/

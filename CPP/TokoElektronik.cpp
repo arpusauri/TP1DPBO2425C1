@@ -275,7 +275,7 @@ void cariData() {
 
 // fungsi untuk inisialisasi data sample
 void initSampleData() {
-    dataBarang.push_back(TokoElektronik("TV001", "43\" The Frame 4K Samsung Smart TV", 11999000, 15));
+    dataBarang.push_back(TokoElektronik("TV001", "43\" The Frame Samsung", 11999000, 15));
     dataBarang.push_back(TokoElektronik("HP001", "iPhone 17 Pro Max", 19719000, 8));
     dataBarang.push_back(TokoElektronik("LP001", "MacBook Air M4", 17999000, 12));
 }
