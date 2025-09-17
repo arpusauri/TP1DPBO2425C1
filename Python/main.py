@@ -1,16 +1,7 @@
-#!/usr/bin/env python3
-"""
-Program CRUD Toko Elektronik
-Driver program untuk menjalankan sistem manajemen toko elektronik
-"""
-
-# Import semua fungsi dari TokoElektronik.py
 from TokoElektronik import *
 
 def main():
-    """Fungsi utama untuk menjalankan program"""
-    
-    # Inisialisasi data sample
+    # inisialisasi data sample
     init_sample_data()
     
     while True:

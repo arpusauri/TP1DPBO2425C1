@@ -69,7 +69,7 @@ vector<TokoElektronik> dataBarang;
 void tampilkanMenu() {
     cout << "\n";
     cout << "=====================================" << endl;
-    cout << "     SISTEM MANAJEMEN TOKO ELEKTRONIK" << endl;
+    cout << "  SISTEM MANAJEMEN TOKO ELEKTRONIK" << endl;
     cout << "=====================================" << endl;
     cout << "1. TAMPILKAN DATA" << endl;
     cout << "2. TAMBAHKAN DATA" << endl;
