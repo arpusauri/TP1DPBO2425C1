@@ -1,33 +1,34 @@
 <?php
-// Include class TokoElektronik
+
+// ambil TokoElektronik
 require_once 'TokoElektronik.php';
 
-// Buat folder uploads jika belum ada
+// buat folder uploads jika tidak ada
 $uploadDir = 'uploads/';
 if (!file_exists($uploadDir)) {
     mkdir($uploadDir, 0755, true);
 }
 
-// Array untuk menyimpan data barang (menggunakan file session)
+// bikin session
 session_start();
 
-// Inisialisasi data jika belum ada
+// bikin data sample make session
 if (!isset($_SESSION['dataBarang'])) {
     $_SESSION['dataBarang'] = array();
     
-    // Data sample awal
-    $_SESSION['dataBarang'][] = new TokoElektronik("TV001", "Samsung Smart TV 43 Inch", 5500000, 15, "uploads/sample-tv.jpg");
-    $_SESSION['dataBarang'][] = new TokoElektronik("HP001", "iPhone 15 Pro Max", 18900000, 8, "uploads/sample-phone.jpg");
-    $_SESSION['dataBarang'][] = new TokoElektronik("LP001", "MacBook Air M2", 16500000, 12, "uploads/sample-laptop.jpg");
+    // ini data sample nya
+    $_SESSION['dataBarang'][] = new TokoElektronik("TV001", "43\" The Frame Samsung", 11999000, 15, "uploads/sample-tv.jpg");
+    $_SESSION['dataBarang'][] = new TokoElektronik("HP001", "iPhone 17 Pro Max", 19719000, 8, "uploads/sample-phone.jpg");
+    $_SESSION['dataBarang'][] = new TokoElektronik("LP001", "MacBook Air M4", 17999000, 12, "uploads/sample-laptop.jpeg");
 }
 
-// Variabel untuk pesan dan form
+// variabel pesan sama form
 $message = '';
 $messageType = '';
 $editBarang = null;
 $isEdit = false;
 
-// Handle form submission
+// handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     
@@ -51,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
             
         case 'clear_all':
-            // Hapus semua file gambar
             foreach ($_SESSION['dataBarang'] as $barang) {
                 if (!empty($barang->getGambar()) && file_exists($barang->getGambar())) {
                     unlink($barang->getGambar());
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Handle GET parameters untuk edit
+// ambil id buat di edit
 if (isset($_GET['edit'])) {
     $editId = $_GET['edit'];
     foreach ($_SESSION['dataBarang'] as $barang) {
@@ -76,7 +76,7 @@ if (isset($_GET['edit'])) {
     }
 }
 
-// Handle pencarian
+// variabel untuk pencarian
 $searchKeyword = $_GET['search'] ?? '';
 $dataBarang = $_SESSION['dataBarang'];
 
@@ -87,7 +87,7 @@ if (!empty($searchKeyword)) {
     });
 }
 
-// Function untuk handle upload file
+// function untuk upload file
 function handleFileUpload($inputName, $oldImagePath = '') {
     global $uploadDir;
     
@@ -101,12 +101,12 @@ function handleFileUpload($inputName, $oldImagePath = '') {
     
     $file = $_FILES[$inputName];
     
-    // Validasi ukuran file (max 5MB)
+    // handle ukuran file
     if ($file['size'] > 5 * 1024 * 1024) {
         throw new Exception('Ukuran file terlalu besar! Maksimal 5MB');
     }
     
-    // Validasi tipe file
+    // handle format file (gambar) yg bisa di upload
     $allowedTypes = array('image/jpeg', 'image/jpg', 'image/png', 'image/gif');
     $fileType = mime_content_type($file['tmp_name']);
     
@@ -114,17 +114,17 @@ function handleFileUpload($inputName, $oldImagePath = '') {
         throw new Exception('Tipe file tidak didukung! Gunakan JPG, PNG, atau GIF');
     }
     
-    // Generate nama file unik
+    // kasih nama file custom
     $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     $fileName = 'img_' . uniqid() . '.' . $fileExtension;
     $filePath = $uploadDir . $fileName;
     
-    // Upload file
+    // upload file
     if (!move_uploaded_file($file['tmp_name'], $filePath)) {
         throw new Exception('Gagal mengupload file');
     }
     
-    // Hapus file lama jika ada
+    // hapus file lama yang sama dengan file baru
     if (!empty($oldImagePath) && file_exists($oldImagePath) && $oldImagePath !== $filePath) {
         unlink($oldImagePath);
     }
@@ -132,7 +132,7 @@ function handleFileUpload($inputName, $oldImagePath = '') {
     return $filePath;
 }
 
-// Function untuk menambah barang
+// function buat nambah barang
 function handleAddBarang() {
     try {
         $idBarang = trim($_POST['idBarang'] ?? '');
@@ -140,35 +140,34 @@ function handleAddBarang() {
         $harga = floatval($_POST['harga'] ?? 0);
         $stok = intval($_POST['stok'] ?? 0);
         
-        // Validasi basic
+        // handle kalau id barang atau nama barang kosong
         if (empty($idBarang) || empty($namaBarang)) {
             return array('success' => false, 'message' => 'ID Barang dan Nama Barang harus diisi!');
         }
         
+        // handle kalau harga dan stok negatif
         if ($harga < 0 || $stok < 0) {
             return array('success' => false, 'message' => 'Harga dan Stok tidak boleh negatif!');
         }
         
-        // Cek duplikasi ID
+        // buat cek apakah id nya udah ada
         foreach ($_SESSION['dataBarang'] as $barang) {
             if ($barang->getIdBarang() === $idBarang) {
                 return array('success' => false, 'message' => 'ID Barang sudah ada!');
             }
         }
         
-        // Handle upload gambar
+        // upload gambar
         $gambarPath = handleFileUpload('gambar');
         
-        // Buat object barang baru
+        // bikin object barang baru
         $barangBaru = new TokoElektronik($idBarang, $namaBarang, $harga, $stok, $gambarPath);
         
-        // Validasi menggunakan method di class
         $validation = $barangBaru->validate();
         if (!$validation['valid']) {
             return array('success' => false, 'message' => implode(', ', $validation['errors']));
         }
         
-        // Tambah ke array
         $_SESSION['dataBarang'][] = $barangBaru;
         
         return array('success' => true, 'message' => 'Barang berhasil ditambahkan!');
@@ -178,7 +177,7 @@ function handleAddBarang() {
     }
 }
 
-// Function untuk update barang
+// function untuk update barang
 function handleUpdateBarang() {
     try {
         $idBarangLama = trim($_POST['idBarangLama'] ?? '');
@@ -187,16 +186,17 @@ function handleUpdateBarang() {
         $harga = floatval($_POST['harga'] ?? 0);
         $stok = intval($_POST['stok'] ?? 0);
         
-        // Validasi basic
+        // handle kalau id barang atau nama barang kosong
         if (empty($idBarang) || empty($namaBarang)) {
             return array('success' => false, 'message' => 'ID Barang dan Nama Barang harus diisi!');
         }
         
+        // handle kalau harga tau stok negatif
         if ($harga < 0 || $stok < 0) {
             return array('success' => false, 'message' => 'Harga dan Stok tidak boleh negatif!');
         }
         
-        // Cari barang yang akan diupdate
+        // cari barang yang akan di update
         $foundIndex = -1;
         $oldImagePath = '';
         foreach ($_SESSION['dataBarang'] as $index => $barang) {
@@ -207,14 +207,14 @@ function handleUpdateBarang() {
             }
         }
         
+        // handle kalau barang gk ketemu
         if ($foundIndex === -1) {
             return array('success' => false, 'message' => 'Barang tidak ditemukan!');
         }
         
-        // Handle upload gambar (jika ada file baru)
+        // handle buat ganti gambar
         $gambarPath = handleFileUpload('gambar', $oldImagePath);
         
-        // Update barang
         $_SESSION['dataBarang'][$foundIndex] = new TokoElektronik($idBarang, $namaBarang, $harga, $stok, $gambarPath);
         
         return array('success' => true, 'message' => 'Barang berhasil diupdate!');
@@ -224,13 +224,12 @@ function handleUpdateBarang() {
     }
 }
 
-// Function untuk delete barang
+// function untuk delete barang
 function handleDeleteBarang() {
     $idBarang = trim($_POST['idBarang'] ?? '');
     
     foreach ($_SESSION['dataBarang'] as $index => $barang) {
         if ($barang->getIdBarang() === $idBarang) {
-            // Hapus file gambar jika ada
             if (!empty($barang->getGambar()) && file_exists($barang->getGambar())) {
                 unlink($barang->getGambar());
             }
@@ -242,13 +241,6 @@ function handleDeleteBarang() {
     
     return array('success' => false, 'message' => 'Barang tidak ditemukan!');
 }
-
-// Hitung statistik
-$totalBarang = count($_SESSION['dataBarang']);
-$totalNilai = 0;
-foreach ($_SESSION['dataBarang'] as $barang) {
-    $totalNilai += $barang->getTotalNilai();
-}
 ?>
 
 <!DOCTYPE html>
@@ -256,315 +248,14 @@ foreach ($_SESSION['dataBarang'] as $barang) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem CRUD Toko Elektronik - PHP OOP</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            line-height: 1.6;
-            color: #333;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #2c3e50, #3498db);
-            color: white;
-            text-align: center;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .alert {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-
-        .alert-error {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-
-        .form-section {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .form-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="number"],
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .form-group input:focus {
-            border-color: #3498db;
-            outline: none;
-        }
-
-        .form-group small {
-            color: #666;
-            font-size: 12px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn:hover {
-            background: #2980b9;
-        }
-
-        .btn-success { background: #27ae60; }
-        .btn-success:hover { background: #219a52; }
-
-        .btn-danger { background: #e74c3c; }
-        .btn-danger:hover { background: #c0392b; }
-
-        .btn-warning { background: #f39c12; }
-        .btn-warning:hover { background: #e67e22; }
-
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-
-        .search-section {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .search-form {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 200px;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-        }
-
-        .stats-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: center;
-            border-left: 4px solid #3498db;
-        }
-
-        .stat-card h3 {
-            font-size: 2em;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            color: #666;
-        }
-
-        .table-section {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .data-table th {
-            background-color: #2c3e50;
-            color: white;
-            font-weight: bold;
-        }
-
-        .data-table tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        .product-image {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 2px solid #ddd;
-        }
-
-        .no-image {
-            width: 60px;
-            height: 60px;
-            background-color: #f8f9fa;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 12px;
-        }
-
-        .price {
-            font-weight: bold;
-            color: #27ae60;
-        }
-
-        .stock-badge {
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .stock-high { background-color: #27ae60; }
-        .stock-medium { background-color: #f39c12; }
-        .stock-low { background-color: #e74c3c; }
-
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        .empty-state h3 {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-form {
-                flex-direction: column;
-            }
-            
-            .search-input {
-                width: 100%;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .data-table {
-                font-size: 14px;
-            }
-            
-            .data-table th,
-            .data-table td {
-                padding: 8px;
-            }
-        }
-    </style>
+    <title>Toko Elektronik</title>
+    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🏪 Sistem Manajemen Toko Elektronik</h1>
-            <p>Kelola inventori barang elektronik dengan PHP OOP</p>
+            <h1>Sistem Manajemen Toko Elektronik</h1>
         </div>
 
         <!-- Alert Messages -->
@@ -576,7 +267,7 @@ foreach ($_SESSION['dataBarang'] as $barang) {
 
         <!-- Form Section -->
         <div class="form-section">
-            <h2><?php echo $isEdit ? '✏️ Edit Barang' : '➕ Tambah Barang Baru'; ?></h2>
+            <h2><?php echo $isEdit ? 'Edit Barang' : 'Tambah Barang'; ?></h2>
             
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="<?php echo $isEdit ? 'update' : 'add'; ?>">
@@ -627,61 +318,38 @@ foreach ($_SESSION['dataBarang'] as $barang) {
                 
                 <div>
                     <button type="submit" class="btn btn-success">
-                        💾 <?php echo $isEdit ? 'Update Barang' : 'Simpan Barang'; ?>
+                        <?php echo $isEdit ? 'Update Barang' : 'Tambah Barang'; ?>
                     </button>
                     
                     <?php if ($isEdit): ?>
-                    <a href="index.php" class="btn btn-danger">❌ Batal Edit</a>
+                    <a href="main.php" class="btn btn-danger">Batal Edit</a>
                     <?php endif; ?>
                     
-                    <button type="reset" class="btn">🔄 Reset Form</button>
+                    <button type="reset" class="btn">Reset</button>
                 </div>
             </form>
         </div>
 
         <!-- Search Section -->
         <div class="search-section">
+            <h2>Cari Barang</h2>
             <form method="GET" class="search-form">
                 <input type="text" name="search" class="search-input" 
                        placeholder="Cari berdasarkan ID atau Nama Barang..." 
                        value="<?php echo htmlspecialchars($searchKeyword); ?>">
                 
-                <button type="submit" class="btn">🔍 Cari</button>
-                <a href="index.php" class="btn">📋 Reset</a>
-                
-                <form method="POST" style="display: inline;">
-                    <input type="hidden" name="action" value="clear_all">
-                    <button type="submit" class="btn btn-warning" 
-                            onclick="return confirm('Yakin ingin menghapus semua data?')">
-                        🗑️ Hapus Semua
-                    </button>
-                </form>
+                <button type="submit" class="btn btn">Cari</button>
+                <a href="main.php" class="btn btn-danger">Batal</a>
             </form>
-        </div>
-
-        <!-- Statistics Section -->
-        <div class="stats-section">
-            <div class="stat-card">
-                <h3><?php echo $totalBarang; ?></h3>
-                <p>Total Produk</p>
-            </div>
-            <div class="stat-card">
-                <h3><?php echo number_format($totalNilai, 0, ',', '.'); ?></h3>
-                <p>Total Nilai Stok (Rp)</p>
-            </div>
-            <div class="stat-card">
-                <h3><?php echo $totalBarang > 0 ? number_format($totalNilai / $totalBarang, 0, ',', '.') : '0'; ?></h3>
-                <p>Rata-rata Nilai (Rp)</p>
-            </div>
         </div>
 
         <!-- Table Section -->
         <div class="table-section">
-            <h2>📋 Daftar Barang</h2>
+            <h2>Daftar Barang</h2>
             
             <?php if (!empty($searchKeyword)): ?>
-            <p>🔍 Hasil Pencarian: "<strong><?php echo htmlspecialchars($searchKeyword); ?></strong>" 
-               (<?php echo count($dataBarang); ?> item ditemukan)</p>
+            <p>Hasil Pencarian: "<strong><?php echo htmlspecialchars($searchKeyword); ?></strong>" 
+               (<?php echo count($dataBarang); ?> Item ditemukan)</p>
             <?php endif; ?>
 
             <table class="data-table">
@@ -693,8 +361,6 @@ foreach ($_SESSION['dataBarang'] as $barang) {
                         <th>Nama Barang</th>
                         <th>Harga</th>
                         <th>Stok</th>
-                        <th>Total Nilai</th>
-                        <th>Status Stok</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -703,7 +369,7 @@ foreach ($_SESSION['dataBarang'] as $barang) {
                     <tr>
                         <td colspan="9">
                             <div class="empty-state">
-                                <h3>📦</h3>
+                                <h3></h3>
                                 <p><?php echo !empty($searchKeyword) ? 'Tidak ada data yang cocok dengan pencarian' : 'Belum ada data barang'; ?></p>
                             </div>
                         </td>
@@ -726,23 +392,17 @@ foreach ($_SESSION['dataBarang'] as $barang) {
                             <td><?php echo htmlspecialchars($barang->getNamaBarang()); ?></td>
                             <td class="price"><?php echo $barang->getFormattedHarga(); ?></td>
                             <td><?php echo $barang->getStok(); ?></td>
-                            <td class="price"><?php echo $barang->getFormattedTotalNilai(); ?></td>
-                            <td>
-                                <span class="stock-badge <?php echo $barang->getStokClass(); ?>">
-                                    <?php echo $barang->getStatusStok(); ?>
-                                </span>
-                            </td>
                             <td>
                                 <div class="action-buttons">
                                     <a href="?edit=<?php echo urlencode($barang->getIdBarang()); ?>" 
-                                       class="btn btn-small">✏️ Edit</a>
+                                       class="btn btn-small">Edit</a>
                                     
                                     <form method="POST" style="display: inline;">
                                         <input type="hidden" name="action" value="delete">
                                         <input type="hidden" name="idBarang" value="<?php echo htmlspecialchars($barang->getIdBarang()); ?>">
                                         <button type="submit" class="btn btn-danger btn-small" 
                                                 onclick="return confirm('Yakin ingin menghapus barang ini?')">
-                                            🗑️ Hapus
+                                            Hapus
                                         </button>
                                     </form>
                                 </div>
@@ -756,9 +416,7 @@ foreach ($_SESSION['dataBarang'] as $barang) {
 
         <!-- Footer -->
         <div style="text-align: center; margin-top: 30px; padding: 20px; color: #666;">
-            <p>© 2024 Sistem Manajemen Toko Elektronik - PHP OOP</p>
-            <p>Total Data: <strong><?php echo count($_SESSION['dataBarang']); ?></strong> | 
-               Data Ditampilkan: <strong><?php echo count($dataBarang); ?></strong></p>
+            <p>&copy 2025 Toko Elektronik</p>
         </div>
     </div>
 </body>

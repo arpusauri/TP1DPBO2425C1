@@ -1,20 +1,14 @@
 <?php
-/**
- * Class TokoElektronik
- * Class untuk mengelola data barang elektronik dengan konsep OOP
- */
+
 class TokoElektronik {
-    
-    // Atribut private (Encapsulation)
+    // atribut (private)
     private $idBarang;
     private $namaBarang;
     private $harga;
     private $stok;
-    private $gambar; // Path file gambar lokal
+    private $gambar; // atribut tambahan buat gambar
     
-    /**
-     * Constructor
-     */
+    // constructor
     public function __construct($idBarang, $namaBarang, $harga, $stok, $gambar = '') {
         $this->idBarang = $idBarang;
         $this->namaBarang = $namaBarang;
@@ -23,35 +17,29 @@ class TokoElektronik {
         $this->gambar = $gambar;
     }
     
-    // ==================== GETTER METHODS ====================
-    
-    public function getIdBarang() {
+    // getter
+    public function getIdBarang(): string {
         return $this->idBarang;
     }
-    
-    public function getNamaBarang() {
+    public function getNamaBarang(): string {
         return $this->namaBarang;
     }
-    
     public function getHarga() {
         return $this->harga;
     }
-    
-    public function getStok() {
+    public function getStok(): int {
         return $this->stok;
     }
-    
     public function getGambar() {
         return $this->gambar;
     }
     
-    // ==================== SETTER METHODS ====================
-    
-    public function setIdBarang($idBarang) {
+    // setter
+    public function setIdBarang(string $idBarang): void {
         $this->idBarang = $idBarang;
     }
     
-    public function setNamaBarang($namaBarang) {
+    public function setNamaBarang(string $namaBarang): void {
         $this->namaBarang = $namaBarang;
     }
     
@@ -59,7 +47,7 @@ class TokoElektronik {
         $this->harga = $harga;
     }
     
-    public function setStok($stok) {
+    public function setStok(int $stok): void {
         $this->stok = $stok;
     }
     
@@ -67,58 +55,12 @@ class TokoElektronik {
         $this->gambar = $gambar;
     }
     
-    // ==================== BUSINESS METHODS ====================
-    
-    /**
-     * Method untuk menghitung total nilai stok
-     */
-    public function getTotalNilai() {
-        return $this->harga * $this->stok;
-    }
-    
-    /**
-     * Method untuk format harga dalam Rupiah
-     */
+    // format rupiah
     public function getFormattedHarga() {
         return 'Rp ' . number_format($this->harga, 0, ',', '.');
-    }
+    }    
     
-    /**
-     * Method untuk format total nilai dalam Rupiah
-     */
-    public function getFormattedTotalNilai() {
-        return 'Rp ' . number_format($this->getTotalNilai(), 0, ',', '.');
-    }
-    
-    /**
-     * Method untuk mendapatkan status stok
-     */
-    public function getStatusStok() {
-        if ($this->stok > 10) {
-            return 'Tinggi';
-        } elseif ($this->stok > 5) {
-            return 'Sedang';
-        } else {
-            return 'Rendah';
-        }
-    }
-    
-    /**
-     * Method untuk mendapatkan CSS class berdasarkan stok
-     */
-    public function getStokClass() {
-        if ($this->stok > 10) {
-            return 'stock-high';
-        } elseif ($this->stok > 5) {
-            return 'stock-medium';
-        } else {
-            return 'stock-low';
-        }
-    }
-    
-    /**
-     * Method untuk validasi data barang
-     */
+    // validasi input
     public function validate() {
         $errors = array();
         
@@ -144,11 +86,9 @@ class TokoElektronik {
         );
     }
     
-    /**
-     * Destructor
-     */
+    // destructor
     public function __destruct() {
-        // Cleanup jika diperlukan
+        
     }
 }
 ?>

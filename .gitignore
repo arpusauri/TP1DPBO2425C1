@@ -1,8 +1,6 @@
 # Ignore file biar gk di push cuy
-.vscode/
+/vscode/
 /CPP/main.exe
 __pycache__/
 /Java/TokoElektronik.class
 /Java/Main.class
-.PHP/ 
-# ignore php buat sementara
