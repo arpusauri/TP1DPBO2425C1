@@ -44,5 +44,7 @@ Dalam program ini terdapat 1 class (TokoElektronik) dan di dalamnya terdapat 4 a
 <img width="304" height="173" alt="image" src="https://github.com/user-attachments/assets/19aa84e2-be55-4e91-b7bb-bf5dd9388d40" />
 
 4. Java
+<img width="304" height="173" alt="image" src="https://github.com/user-attachments/assets/eac7d0f7-b973-432a-8e92-216e513eb32a" />
 
-5. PHP
+6. PHP
+<img width="304" height="173" alt="image" src="https://github.com/user-attachments/assets/8e5fd81d-c01d-4624-ab8c-048be1760c36" />
