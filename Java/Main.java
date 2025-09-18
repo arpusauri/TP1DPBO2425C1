@@ -2,31 +2,25 @@ import java.util.Scanner;
 import java.util.InputMismatchException;
 
 public class Main {
-    
-    // Scanner untuk input menu
+    // scanner untuk input
     private static Scanner menuScanner = new Scanner(System.in);
     
-    /**
-     * Method utama untuk menjalankan program
-     * @param args Command line arguments
-     */
     public static void main(String[] args) {
         
-        // Inisialisasi data sample
+        // inisialisasi data awal
         TokoElektronik.initSampleData();
         
+        // int untuk pilihan
         int pilihan;
         
-        // Main program loop
+        // untuk pilihan menu
         while (true) {
             try {
-                // Tampilkan menu dan ambil pilihan user
                 TokoElektronik.tampilkanMenu();
                 System.out.print("Pilih menu: ");
                 pilihan = menuScanner.nextInt();
-                menuScanner.nextLine(); // Clear buffer setelah nextInt()
+                menuScanner.nextLine();
                 
-                // Process pilihan user
                 switch (pilihan) {
                     case 1:
                         TokoElektronik.tampilkanSemuaData();
@@ -45,15 +39,13 @@ public class Main {
                         break;
                     case 6:
                         System.out.println("\n=== Terima kasih! Program selesai ===");
-                        // Clean up resources
                         cleanup();
-                        return; // Exit program
+                        return;
                     default:
                         System.out.println("\nPilihan tidak valid! Silakan pilih 1-6.");
                         break;
                 }
                 
-                // Pause sebelum kembali ke menu (kecuali exit)
                 if (pilihan != 6) {
                     System.out.print("\nTekan Enter untuk kembali ke menu...");
                     menuScanner.nextLine();
@@ -61,7 +53,7 @@ public class Main {
                 
             } catch (InputMismatchException e) {
                 System.out.println("\nError: Masukkan angka yang valid!");
-                menuScanner.nextLine(); // Clear invalid input
+                menuScanner.nextLine();
                 System.out.print("Tekan Enter untuk melanjutkan...");
                 menuScanner.nextLine();
             } catch (Exception e) {
@@ -72,14 +64,12 @@ public class Main {
         }
     }
     
-    /**
-     * Method untuk membersihkan resources sebelum program berakhir
-     */
+    // bersihin data
     private static void cleanup() {
         try {
             menuScanner.close();
             TokoElektronik.closeScanner();
-            System.out.println("Resources berhasil dibersihkan.");
+            System.out.println("\n");
         } catch (Exception e) {
             System.err.println("Warning: Gagal membersihkan resources - " + e.getMessage());
         }
